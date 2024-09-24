@@ -19,7 +19,8 @@ def process_data(data):
                 total_sum += num
             if num % 2 == 0:
                 even_numbers.append(num)
-        print(f"Сумма после второго отрицательного: {total_sum}")
+        if neg_count >= 2:
+            print(f"Сумма после второго отрицательного: {total_sum}")
         print(f"Четные числа: {even_numbers}")
     elif isinstance(data, set):
         print(f"Максимум: {max(data)}, Минимум: {min(data)}")
@@ -65,9 +66,15 @@ def menu():
         choice = input("Выберите задание (1-5): ")
 
         if choice == '1':
-            side = float(input("Введите длину стороны треугольника: "))
-            perimeter, area = triangle(side)
-            print(f"Периметр: {perimeter}, Площадь: {area}")
+            try:
+                side = float(input("Введите длину стороны треугольника: "))
+                if side < 0:
+                    raise ValueError("Число отрицательное")
+                perimeter, area = triangle(side)
+                print(f"Периметр: {perimeter}, Площадь: {area}")
+            except ValueError as e:
+                print(f"Введено не число или {e}")
+                continue
         elif choice == '2':
             data_type = input("Введите тип данных (list, set, int, str): ")
             if data_type == 'list':
@@ -75,7 +82,11 @@ def menu():
             elif data_type == 'set':
                 data = set(map(int, input("Введите элементы множества через пробел: ").split()))
             elif data_type == 'int':
-                data = int(input("Введите число: "))
+                try:
+                    data = int(input("Введите число: "))
+                except ValueError:
+                    print(f"Введено не число")
+                    continue
             elif data_type == 'str':
                 data = input("Введите строку: ")
             else:
@@ -83,20 +94,32 @@ def menu():
                 continue
             process_data(data)
         elif choice == '3':
-            n, m = map(int, input("Введите размеры массива (n m): ").split())
-            matrix = [list(map(int, input().split())) for _ in range(n)]
-            i, j = map(int, input("Введите индексы столбцов для замены (i j): ").split())
-            swapped_matrix = swap_columns(matrix, i, j)
-            print("Изменённый массив:")
-            for row in swapped_matrix:
-                print(row)
+            try:
+                n, m = map(int, input("размеры массива (n m): ").split())
+                matrix = [list(map(int, input().split())) for _ in range(n)]
+                matrix_full = all(len(row) == m for row in matrix)
+                if not matrix_full:
+                    raise Exception("Матрица не заполнена")
+                i, j = map(int, input("индексы столбцов для замены (i j): ").split())
+                if i > m - 1 or j > m - 1:
+                    raise Exception("индексы столбцов для замены выходят за границы")
+                swapped_matrix = swap_columns(matrix, i, j)
+                print("Изменённый массив:")
+                for row in swapped_matrix:
+                    print(row)
+            except ValueError:
+                print(f"Введено не число")
+                continue
+            except Exception as e:
+                print(f"{e}")
+                continue
         elif choice == '4':
             example_try_except()
         elif choice == '5':
-            print("До свидания!")
+            print("Конец")
             break
         else:
-            print("Неверный выбор. Попробуйте снова.")
+            print("Неправильный выбор")
 
 # Запуск программы
 if __name__ == "__main__":
